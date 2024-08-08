@@ -36,7 +36,6 @@ def list_products():
     for row in rows:
         tk.Label(list_window, text=row).pack()
 
-# Função para registrar
 def register_sale():
     produto_id = produto_id_entry.get()
     quantidade_venda = quantidade_venda_entry.get()
