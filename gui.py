@@ -86,3 +86,5 @@ preco_entry.grid(row=2, column=1)
 
 tk.Button(root, text="Adicionar Produto", command=add_product).grid(row=3, column=0, columnspan=2)
 
+# Listar os produtos (Interface)
+tk.Button(root, text="Listar Produtos", command=list_products).grid(row=4, column=0, columnspan=2)
