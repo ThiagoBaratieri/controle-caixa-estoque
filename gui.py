@@ -71,3 +71,18 @@ def register_sale():
 root = tk.Tk()
 root.title("Sistema de Controle de Caixa e Estoque")
 
+# Adicionar os produtos (Interface)
+tk.Label(root, text="Nome do Produto:").grid(row=0, column=0)
+nome_entry = tk.Entry(root)
+nome_entry.grid(row=0, column=1)
+
+tk.Label(root, text="Quantidade:").grid(row=1, column=0)
+quantidade_entry = tk.Entry(root)
+quantidade_entry.grid(row=1, column=1)
+
+tk.Label(root, text="Preço:").grid(row=2, column=0)
+preco_entry = tk.Entry(root)
+preco_entry.grid(row=2, column=1)
+
+tk.Button(root, text="Adicionar Produto", command=add_product).grid(row=3, column=0, columnspan=2)
+
