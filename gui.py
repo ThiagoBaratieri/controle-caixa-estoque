@@ -88,3 +88,17 @@ tk.Button(root, text="Adicionar Produto", command=add_product).grid(row=3, colum
 
 # Listar os produtos (Interface)
 tk.Button(root, text="Listar Produtos", command=list_products).grid(row=4, column=0, columnspan=2)
+
+# Registrar vendas
+tk.Label(root, text="ID do Produto:").grid(row=5, column=0)
+produto_id_entry = tk.Entry(root)
+produto_id_entry.grid(row=5, column=1)
+
+tk.Label(root, text="Quantidade:").grid(row=6, column=0)
+quantidade_venda_entry = tk.Entry(root)
+quantidade_venda_entry.grid(row=6, column=1)
+
+tk.Button(root, text="Registrar Venda", command=register_sale).grid(row=7, column=0, columnspan=2)
+
+# Inicia o loop principal da interface gráfica
+root.mainloop()
