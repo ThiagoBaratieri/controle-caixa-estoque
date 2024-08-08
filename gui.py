@@ -36,6 +36,7 @@ def list_products():
     for row in rows:
         tk.Label(list_window, text=row).pack()
 
+# Função para registrar vendas
 def register_sale():
     produto_id = produto_id_entry.get()
     quantidade_venda = quantidade_venda_entry.get()
@@ -66,4 +67,7 @@ def register_sale():
     else:
         messagebox.showerror("Erro", "Todos os campos devem ser preenchidos.")
 
+# Criar a janela principal (Cria e define o titulo)
+root = tk.Tk()
+root.title("Sistema de Controle de Caixa e Estoque")
 
