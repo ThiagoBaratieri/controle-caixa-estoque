@@ -26,7 +26,7 @@ def add_product():
 def list_products():
     conn = sqlite3.connect('data/estoque_caixa.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM produtos")
+    cursor.execute("SELECT id, nome, quantidade, preco FROM produtos")
     rows = cursor.fetchall()
     conn.close()
     
@@ -34,7 +34,7 @@ def list_products():
     list_window.title("Lista de Produtos")
     
     for row in rows:
-        tk.Label(list_window, text=row).pack()
+        tk.Label(list_window, text=f'ID: {row[0]}, Nome: {row[1]}, Quantidade: {row[2]}, Preço: {row[3]}').pack()
 
 # Função para registrar vendas
 def register_sale():
