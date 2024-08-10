@@ -82,33 +82,33 @@ root = tk.Tk()
 root.title("Sistema de Controle de Caixa e Estoque")
 
 # Adicionar os produtos (Interface)
-tk.Label(root, text="Nome do Produto:").grid(row=0, column=0)
-nome_entry = tk.Entry(root)
+ttk.Label(root, text="Nome do Produto:").grid(row=0, column=0)
+nome_entry = ttk.Entry(root)
 nome_entry.grid(row=0, column=1)
 
-tk.Label(root, text="Quantidade:").grid(row=1, column=0)
-quantidade_entry = tk.Entry(root)
+ttk.Label(root, text="Quantidade:").grid(row=1, column=0)
+quantidade_entry = ttk.Entry(root)
 quantidade_entry.grid(row=1, column=1)
 
-tk.Label(root, text="Preço:").grid(row=2, column=0)
-preco_entry = tk.Entry(root)
+ttk.Label(root, text="Preço:").grid(row=2, column=0)
+preco_entry = ttk.Entry(root)
 preco_entry.grid(row=2, column=1)
 
-tk.Button(root, text="Adicionar Produto", command=add_product).grid(row=3, column=0, columnspan=2)
+ttk.Button(root, text="Adicionar Produto", command=add_product).grid(row=3, column=0, columnspan=2)
 
 # Listar os produtos (Interface)
-tk.Button(root, text="Listar Produtos", command=list_products).grid(row=4, column=0, columnspan=2)
+ttk.Button(root, text="Listar Produtos", command=list_products).grid(row=4, column=0, columnspan=2)
 
 # Registrar vendas
-tk.Label(root, text="ID do Produto:").grid(row=5, column=0)
-produto_id_entry = tk.Entry(root)
+ttk.Label(root, text="ID do Produto:").grid(row=5, column=0)
+produto_id_entry = ttk.Entry(root)
 produto_id_entry.grid(row=5, column=1)
 
-tk.Label(root, text="Quantidade:").grid(row=6, column=0)
-quantidade_venda_entry = tk.Entry(root)
+ttk.Label(root, text="Quantidade:").grid(row=6, column=0)
+quantidade_venda_entry = ttk.Entry(root)
 quantidade_venda_entry.grid(row=6, column=1)
 
-tk.Button(root, text="Registrar Venda", command=register_sale).grid(row=7, column=0, columnspan=2)
+ttk.Button(root, text="Registrar Venda", command=register_sale).grid(row=7, column=0, columnspan=2)
 
 # Inicia o loop principal da interface gráfica
 root.mainloop()
