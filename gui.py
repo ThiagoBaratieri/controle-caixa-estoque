@@ -33,9 +33,18 @@ def list_products():
     
     list_window = tk.Toplevel()
     list_window.title("Lista de Produtos")
+
+    # Usar Treeview para exibir os produtos em formato de tabela
+    tree = ttk.Treeview(list_window, columns=('ID', 'Nome', 'Quantidade', 'Preço'), show='headings')
+    tree.heading('ID', text='ID')
+    tree.heading('Nome', text='Nome')
+    tree.heading('Quantidade', text='Quantidade')
+    tree.heading('Preço', text='Preço')
     
     for row in rows:
-        tk.Label(list_window, text=f'ID: {row[0]}, Nome: {row[1]}, Quantidade: {row[2]}, Preço: {row[3]}').pack()
+        tree.insert('', tk.END, values=row)
+
+    tree.pack()
 
 # Função para registrar vendas
 def register_sale():
