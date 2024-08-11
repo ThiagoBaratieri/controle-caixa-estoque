@@ -48,19 +48,29 @@ class Application(tk.Tk):
     def add_product(self):
         nome = self.nome_entry.get()
         quantidade = self.quantidade_entry.get()
-        preco = self.preco_entry.get()
+        preco = self.preco_entry.get().replace(',', '.')  # Substituir vírgulas por pontos
         
         if nome and quantidade and preco:
-            conn = sqlite3.connect('data/estoque_caixa.db')
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO produtos (nome, quantidade, preco) VALUES (?, ?, ?)", (nome, quantidade, preco))
-            conn.commit()
-            conn.close()
-            
-            self.nome_entry.delete(0, tk.END)
-            self.quantidade_entry.delete(0, tk.END)
-            self.preco_entry.delete(0, tk.END)
-            messagebox.showinfo("Sucesso", "Produto adicionado com sucesso!")
+            try:
+                quantidade = int(quantidade)
+                preco = float(preco)
+
+                conn = sqlite3.connect('data/estoque_caixa.db')
+                cursor = conn.cursor()
+                cursor.execute("INSERT INTO produtos (nome, quantidade, preco) VALUES (?, ?, ?)", (nome, quantidade, preco))
+                conn.commit()
+                conn.close()
+                
+                self.nome_entry.delete(0, tk.END)
+                self.quantidade_entry.delete(0, tk.END)
+                self.preco_entry.delete(0, tk.END)
+                messagebox.showinfo("Sucesso", "Produto adicionado com sucesso!")
+                
+                # Atualizar a lista de produtos no combobox
+                self.load_products()
+
+            except ValueError:
+                messagebox.showerror("Erro", "Quantidade deve ser um número inteiro e preço deve ser um número válido.")
         else:
             messagebox.showerror("Erro", "Todos os campos devem ser preenchidos.")
 
@@ -91,7 +101,7 @@ class Application(tk.Tk):
         
         # Inserir os dados na Treeview
         for row in rows:
-            preco_formatado = f"R$ {row[3]:.2f}"  # Formatar o preço
+            preco_formatado = f"R$ {float(row[3]):.2f}"  # Converter para float antes de formatar
             tree.insert("", tk.END, values=(row[0], row[1], row[2], preco_formatado))
 
     # Função para registrar venda
@@ -100,27 +110,33 @@ class Application(tk.Tk):
         quantidade_venda = self.quantidade_venda_entry.get()
         
         if produto_id and quantidade_venda:
-            conn = sqlite3.connect('data/estoque_caixa.db')
-            cursor = conn.cursor()
-            
-            cursor.execute("SELECT quantidade, preco FROM produtos WHERE id=?", (produto_id,))
-            produto = cursor.fetchone()
-            
-            if produto:
-                nova_quantidade = produto[0] - int(quantidade_venda)
-                if nova_quantidade >= 0:
-                    total_venda = produto[1] * int(quantidade_venda)
-                    cursor.execute("UPDATE produtos SET quantidade=? WHERE id=?", (nova_quantidade, produto_id))
-                    cursor.execute("INSERT INTO vendas (produto_id, quantidade, total, data) VALUES (?, ?, ?, datetime('now'))", (produto_id, quantidade_venda, total_venda))
-                    conn.commit()
-                    conn.close()
-                    
-                    self.quantidade_venda_entry.delete(0, tk.END)
-                    messagebox.showinfo("Sucesso", "Venda registrada com sucesso!")
+            try:
+                quantidade_venda = int(quantidade_venda)
+
+                conn = sqlite3.connect('data/estoque_caixa.db')
+                cursor = conn.cursor()
+                
+                cursor.execute("SELECT quantidade, preco FROM produtos WHERE id=?", (produto_id,))
+                produto = cursor.fetchone()
+                
+                if produto:
+                    nova_quantidade = produto[0] - quantidade_venda
+                    if nova_quantidade >= 0:
+                        total_venda = produto[1] * quantidade_venda
+                        cursor.execute("UPDATE produtos SET quantidade=? WHERE id=?", (nova_quantidade, produto_id))
+                        cursor.execute("INSERT INTO vendas (produto_id, quantidade, total, data) VALUES (?, ?, ?, datetime('now'))", (produto_id, quantidade_venda, total_venda))
+                        conn.commit()
+                        conn.close()
+                        
+                        self.quantidade_venda_entry.delete(0, tk.END)
+                        messagebox.showinfo("Sucesso", "Venda registrada com sucesso!")
+                    else:
+                        messagebox.showerror("Erro", "Quantidade insuficiente em estoque.")
                 else:
-                    messagebox.showerror("Erro", "Quantidade insuficiente em estoque.")
-            else:
-                messagebox.showerror("Erro", "Produto não encontrado.")
+                    messagebox.showerror("Erro", "Produto não encontrado.")
+
+            except ValueError:
+                messagebox.showerror("Erro", "A quantidade de venda deve ser um número inteiro.")
         else:
             messagebox.showerror("Erro", "Todos os campos devem ser preenchidos.")
     
@@ -160,4 +176,3 @@ class Application(tk.Tk):
             tree.insert("", tk.END, values=sale)
 
         tree.pack()
-
