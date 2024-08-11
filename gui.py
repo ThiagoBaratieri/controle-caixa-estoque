@@ -40,6 +40,9 @@ class Application(tk.Tk):
 
         tk.Button(self, text="Registrar Venda", command=self.register_sale).grid(row=7, column=0, columnspan=2)
 
+        # Botão para o relatório de vendas
+        tk.Button(self, text="Relatório de Vendas", command=self.list_sales).grid(row=8, column=0, columnspan=2)
+
     # Função para adicionar produtos
     def add_product(self):
         nome = self.nome_entry.get()
@@ -83,7 +86,7 @@ class Application(tk.Tk):
         for row in rows:
             tree.insert("", tk.END, values=row)
 
-    # Função para registrar produtos
+    # Função para registrar venda
     def register_sale(self):
         produto_id = self.produto_combobox.get().split(' ')[0]  # Obtendo apenas o ID do texto
         quantidade_venda = self.quantidade_venda_entry.get()
