@@ -104,6 +104,9 @@ class Application(tk.Tk):
             preco_formatado = f"R$ {float(row[3]):.2f}"  # Converter para float antes de formatar
             tree.insert("", tk.END, values=(row[0], row[1], row[2], preco_formatado))
 
+        # Botão para deletar produto
+        tk.Button(list_window, text="Deletar Produto", command=lambda: self.delete_product(tree)).pack()
+
     # Função para registrar venda
     def register_sale(self):
         produto_id = self.produto_combobox.get().split(' ')[0]  # Obtendo apenas o ID do texto
@@ -176,3 +179,34 @@ class Application(tk.Tk):
             tree.insert("", tk.END, values=sale)
 
         tree.pack()
+
+    def delete_product(self, tree):
+        # Obtém o item selecionado
+        selected_item = tree.selection()
+
+        if not selected_item:
+            messagebox.showerror("Erro", "Nenhum produto selecionado.")
+            return
+
+        # Obtém os valores da linha selecionada
+        item_values = tree.item(selected_item, "values")
+        product_id = item_values[0]
+
+        # Confirmação de deleção
+        confirm = messagebox.askyesno("Confirmação", f"Tem certeza que deseja deletar o produto ID {product_id}?")
+
+        if confirm:
+            conn = sqlite3.connect('data/estoque_caixa.db')
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM produtos WHERE id=?", (product_id,))
+            conn.commit()
+            conn.close()
+
+            # Remove o item da Treeview
+            tree.delete(selected_item)
+            
+            # Atualiza a lista de produtos no combobox
+            self.load_products()
+
+            messagebox.showinfo("Sucesso", "Produto deletado com sucesso!")
+
