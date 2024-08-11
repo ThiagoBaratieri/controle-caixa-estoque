@@ -7,6 +7,7 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sistema de Controle de Caixa e Estoque")
+        self.geometry('1000x500')
         self.setup_ui()
 
     def setup_ui(self):
@@ -76,10 +77,16 @@ class Application(tk.Tk):
         
         # Configuração da Treeview
         tree = ttk.Treeview(list_window, columns=("ID", "Nome", "Quantidade", "Preço"), show='headings')
-        tree.heading("ID", text="ID")
-        tree.heading("Nome", text="Nome")
+        tree.heading("ID", text="ID", anchor="e")
+        tree.heading("Nome", text="Nome", anchor="w")
         tree.heading("Quantidade", text="Quantidade")
         tree.heading("Preço", text="Preço")
+
+        tree.column("ID", anchor="e")
+        tree.column("Nome", anchor="w")
+        tree.column("Quantidade", anchor="center")
+        tree.column("Preço", anchor="center")
+
         tree.pack(fill=tk.BOTH, expand=True)
         
         # Inserir os dados na Treeview
@@ -125,6 +132,33 @@ class Application(tk.Tk):
         conn.close()
 
         self.produto_combobox['values'] = [f"{id} - {nome}" for id, nome in produtos]
+
+    # Função para listar vendas
+    def list_sales(self):
+        conn = sqlite3.connect('data/estoque_caixa.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT produto_id, quantidade, total, data FROM vendas")
+        sales = cursor.fetchall()
+        conn.close()
+
+        sales_window = tk.Toplevel()
+        sales_window.title("Relatório de Vendas")
+
+        tree = ttk.Treeview(sales_window, columns=("produto_id", "quantidade", "total", "data"), show="headings")
+        tree.heading("produto_id", text="ID do Produto")
+        tree.heading("quantidade", text="Quantidade Vendida")
+        tree.heading("total", text="Total da Venda")
+        tree.heading("data", text="Data da Venda")
+
+        tree.column("produto_id", anchor="center")
+        tree.column("quantidade", anchor="center")
+        tree.column("total", anchor="center")
+        tree.column("data", anchor="center")
+
+        for sale in sales:
+            tree.insert("", tk.END, values=sale)
+
+        tree.pack()
 
 # Criar e iniciar o aplicativo
 if __name__ == "__main__":
