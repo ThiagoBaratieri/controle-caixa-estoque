@@ -161,7 +161,3 @@ class Application(tk.Tk):
 
         tree.pack()
 
-# Criar e iniciar o aplicativo
-if __name__ == "__main__":
-    app = Application()
-    app.mainloop()
