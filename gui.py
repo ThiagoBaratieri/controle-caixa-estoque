@@ -80,18 +80,19 @@ class Application(tk.Tk):
         tree.heading("ID", text="ID", anchor="e")
         tree.heading("Nome", text="Nome", anchor="w")
         tree.heading("Quantidade", text="Quantidade")
-        tree.heading("Preço", text="Preço")
+        tree.heading("Preço", text="Preço", anchor="w")
 
         tree.column("ID", anchor="e")
         tree.column("Nome", anchor="w")
         tree.column("Quantidade", anchor="center")
-        tree.column("Preço", anchor="center")
+        tree.column("Preço", anchor="w")
 
         tree.pack(fill=tk.BOTH, expand=True)
         
         # Inserir os dados na Treeview
         for row in rows:
-            tree.insert("", tk.END, values=row)
+            preco_formatado = f"R$ {row[3]:.2f}"  # Formatar o preço
+            tree.insert("", tk.END, values=(row[0], row[1], row[2], preco_formatado))
 
     # Função para registrar venda
     def register_sale(self):
