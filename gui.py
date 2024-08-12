@@ -44,6 +44,9 @@ class Application(tk.Tk):
         # Botão para o relatório de vendas
         tk.Button(self, text="Relatório de Vendas", command=self.list_sales).grid(row=8, column=0, columnspan=2)
 
+        # Botão para zerar o estoque
+        tk.Button(self, text="Zerar Quantidades", command=self.reset_quantities).grid(row=9, column=0, columnspan=2)
+
     # Função para adicionar produtos
     def add_product(self):
         nome = self.nome_entry.get()
@@ -180,6 +183,7 @@ class Application(tk.Tk):
 
         tree.pack()
 
+    # Funçao para deletar um produto
     def delete_product(self, tree):
         # Obtém o item selecionado
         selected_item = tree.selection()
@@ -210,3 +214,12 @@ class Application(tk.Tk):
 
             messagebox.showinfo("Sucesso", "Produto deletado com sucesso!")
 
+    # Função para zerar estoque
+    def reset_quantities(self):
+        conn = sqlite3.connect('data/estoque_caixa.db')
+        cursor = conn.cursor()
+        cursor.execute("UPDATE produtos SET quantidade = 0")
+        conn.commit()
+        conn.close()
+        messagebox.showinfo("Sucesso", "Quantidades de todos os produtos foram zeradas!")
+        self.load_products()  # Atualiza o combobox de produtos
