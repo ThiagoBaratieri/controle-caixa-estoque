@@ -39,6 +39,7 @@ class Application(tk.Tk):
         self.quantidade_venda_entry = tk.Entry(self)
         self.quantidade_venda_entry.grid(row=6, column=1)
 
+        # Botão para registrar venda
         tk.Button(self, text="Registrar Venda", command=self.register_sale).grid(row=7, column=0, columnspan=2)
 
         # Botão para o relatório de vendas
@@ -46,6 +47,9 @@ class Application(tk.Tk):
 
         # Botão para zerar o estoque
         tk.Button(self, text="Zerar Quantidades", command=self.reset_quantities).grid(row=9, column=0, columnspan=2)
+
+        # Botão para editar produtos
+        tk.Button(self, text="Editar Produto", command=self.edit_product).grid(row=10, column=0, columnspan=2)
 
     # Função para adicionar produtos
     def add_product(self):
@@ -223,3 +227,67 @@ class Application(tk.Tk):
         conn.close()
         messagebox.showinfo("Sucesso", "Quantidades de todos os produtos foram zeradas!")
         self.load_products()  # Atualiza o combobox de produtos
+
+    def edit_product(self):
+        selected_product = self.produto_combobox.get()
+        if not selected_product:
+            messagebox.showerror("Erro", "Selecione um produto para editar.")
+            return
+
+        produto_id = selected_product.split(' ')[0]
+
+        conn = sqlite3.connect('data/estoque_caixa.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT nome, quantidade, preco FROM produtos WHERE id=?", (produto_id,))
+        produto = cursor.fetchone()
+        conn.close()
+
+        if not produto:
+            messagebox.showerror("Erro", "Produto não encontrado.")
+            return
+
+        edit_window = tk.Toplevel()
+        edit_window.title("Editar Produto")
+
+        tk.Label(edit_window, text="Nome do Produto:").grid(row=0, column=0)
+        nome_entry = tk.Entry(edit_window)
+        nome_entry.insert(0, produto[0])
+        nome_entry.grid(row=0, column=1)
+
+        tk.Label(edit_window, text="Quantidade:").grid(row=1, column=0)
+        quantidade_entry = tk.Entry(edit_window)
+        quantidade_entry.insert(0, produto[1])
+        quantidade_entry.grid(row=1, column=1)
+
+        tk.Label(edit_window, text="Preço:").grid(row=2, column=0)
+        preco_entry = tk.Entry(edit_window)
+        preco_entry.insert(0, produto[2])
+        preco_entry.grid(row=2, column=1)
+
+        def save_changes():
+            nome = nome_entry.get()
+            quantidade = quantidade_entry.get()
+            preco = preco_entry.get()
+
+            if nome and quantidade and preco:
+                try:
+                    quantidade = int(quantidade)
+                    preco = float(preco)
+
+                    conn = sqlite3.connect('data/estoque_caixa.db')
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE produtos SET nome=?, quantidade=?, preco=? WHERE id=?", (nome, quantidade, preco, produto_id))
+                    conn.commit()
+                    conn.close()
+
+                    messagebox.showinfo("Sucesso", "Produto atualizado com sucesso!")
+                    edit_window.destroy()
+                    self.load_products()  # Atualiza o combobox de produtos
+                    self.list_products()  # Atualiza a lista de produtos
+
+                except ValueError:
+                    messagebox.showerror("Erro", "Quantidade deve ser um número inteiro e preço deve ser um número válido.")
+            else:
+                messagebox.showerror("Erro", "Todos os campos devem ser preenchidos.")
+
+        tk.Button(edit_window, text="Salvar", command=save_changes).grid(row=3, column=0, columnspan=2)
