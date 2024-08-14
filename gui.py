@@ -2,6 +2,9 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import ttk
 import sqlite3
+import os
+import sys
+
 
 class Application(tk.Tk):
     def __init__(self):
@@ -10,46 +13,56 @@ class Application(tk.Tk):
         self.geometry('1000x500')
         self.setup_ui()
 
+    def get_db_path(self):
+        # Obtém o caminho do diretório onde o script está sendo executado
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, 'data', 'estoque_caixa.db')
+
+    def connect_to_database(self):
+        db_path = self.get_db_path()
+        print(f"Conectando ao banco de dados em: {db_path}")
+        return sqlite3.connect(db_path)
+
     def setup_ui(self):
-        # Adicionar os produtos (Interface)
-        tk.Label(self, text="Nome do Produto:").grid(row=0, column=0)
-        self.nome_entry = tk.Entry(self)
-        self.nome_entry.grid(row=0, column=1)
+            # Adicionar os produtos (Interface)
+            tk.Label(self, text="Nome do Produto:").grid(row=0, column=0)
+            self.nome_entry = tk.Entry(self)
+            self.nome_entry.grid(row=0, column=1)
 
-        tk.Label(self, text="Quantidade:").grid(row=1, column=0)
-        self.quantidade_entry = tk.Entry(self)
-        self.quantidade_entry.grid(row=1, column=1)
+            tk.Label(self, text="Quantidade:").grid(row=1, column=0)
+            self.quantidade_entry = tk.Entry(self)
+            self.quantidade_entry.grid(row=1, column=1)
 
-        tk.Label(self, text="Preço:").grid(row=2, column=0)
-        self.preco_entry = tk.Entry(self)
-        self.preco_entry.grid(row=2, column=1)
+            tk.Label(self, text="Preço:").grid(row=2, column=0)
+            self.preco_entry = tk.Entry(self)
+            self.preco_entry.grid(row=2, column=1)
 
-        tk.Button(self, text="Adicionar Produto", command=self.add_product).grid(row=3, column=0, columnspan=2)
+            tk.Button(self, text="Adicionar Produto", command=self.add_product).grid(row=3, column=0, columnspan=2)
 
-        # Listar os produtos (Interface)
-        tk.Button(self, text="Listar Produtos", command=self.list_products).grid(row=4, column=0, columnspan=2)
+            # Listar os produtos (Interface)
+            tk.Button(self, text="Listar Produtos", command=self.list_products).grid(row=4, column=0, columnspan=2)
 
-        # Registrar vendas
-        tk.Label(self, text="Produto:").grid(row=5, column=0)
-        self.produto_combobox = ttk.Combobox(self)
-        self.produto_combobox.grid(row=5, column=1)
-        self.load_products()
+            # Registrar vendas
+            tk.Label(self, text="Produto:").grid(row=5, column=0)
+            self.produto_combobox = ttk.Combobox(self)
+            self.produto_combobox.grid(row=5, column=1)
+            self.load_products()
 
-        tk.Label(self, text="Quantidade:").grid(row=6, column=0)
-        self.quantidade_venda_entry = tk.Entry(self)
-        self.quantidade_venda_entry.grid(row=6, column=1)
+            tk.Label(self, text="Quantidade:").grid(row=6, column=0)
+            self.quantidade_venda_entry = tk.Entry(self)
+            self.quantidade_venda_entry.grid(row=6, column=1)
 
-        # Botão para registrar venda
-        tk.Button(self, text="Registrar Venda", command=self.register_sale).grid(row=7, column=0, columnspan=2)
+            # Botão para registrar venda
+            tk.Button(self, text="Registrar Venda", command=self.register_sale).grid(row=7, column=0, columnspan=2)
 
-        # Botão para o relatório de vendas
-        tk.Button(self, text="Relatório de Vendas", command=self.list_sales).grid(row=8, column=0, columnspan=2)
+            # Botão para o relatório de vendas
+            tk.Button(self, text="Relatório de Vendas", command=self.list_sales).grid(row=8, column=0, columnspan=2)
 
-        # Botão para zerar o estoque
-        tk.Button(self, text="Zerar Quantidades", command=self.reset_quantities).grid(row=9, column=0, columnspan=2)
+            # Botão para zerar o estoque
+            tk.Button(self, text="Zerar Quantidades", command=self.reset_quantities).grid(row=9, column=0, columnspan=2)
 
-        # Botão para editar produtos
-        tk.Button(self, text="Editar Produto", command=self.edit_product).grid(row=10, column=0, columnspan=2)
+            # Botão para editar produtos
+            tk.Button(self, text="Editar Produto", command=self.edit_product).grid(row=10, column=0, columnspan=2)
 
     # Função para adicionar produtos
     def add_product(self):
@@ -62,7 +75,7 @@ class Application(tk.Tk):
                 quantidade = int(quantidade)
                 preco = float(preco)
 
-                conn = sqlite3.connect('data/estoque_caixa.db')
+                conn = self.connect_to_database()  # Alterado
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO produtos (nome, quantidade, preco) VALUES (?, ?, ?)", (nome, quantidade, preco))
                 conn.commit()
@@ -83,7 +96,7 @@ class Application(tk.Tk):
 
     # Função para listar produtos
     def list_products(self):
-        conn = sqlite3.connect('data/estoque_caixa.db')
+        conn = self.connect_to_database()  # Alterado
         cursor = conn.cursor()
         cursor.execute("SELECT id, nome, quantidade, preco FROM produtos")
         rows = cursor.fetchall()
@@ -123,7 +136,7 @@ class Application(tk.Tk):
             try:
                 quantidade_venda = int(quantidade_venda)
 
-                conn = sqlite3.connect('data/estoque_caixa.db')
+                conn = self.connect_to_database()  # Alterado
                 cursor = conn.cursor()
                 
                 cursor.execute("SELECT quantidade, preco FROM produtos WHERE id=?", (produto_id,))
@@ -152,7 +165,7 @@ class Application(tk.Tk):
     
     # Função para selecionar produtos da minha lista
     def load_products(self):
-        conn = sqlite3.connect('data/estoque_caixa.db')
+        conn = self.connect_to_database()  # Alterado
         cursor = conn.cursor()
         cursor.execute("SELECT id, nome FROM produtos")
         produtos = cursor.fetchall()
@@ -162,7 +175,7 @@ class Application(tk.Tk):
 
     # Função para listar vendas
     def list_sales(self):
-        conn = sqlite3.connect('data/estoque_caixa.db')
+        conn = self.connect_to_database()  # Alterado
         cursor = conn.cursor()
         cursor.execute("SELECT produto_id, quantidade, total, data FROM vendas")
         sales = cursor.fetchall()
@@ -187,7 +200,7 @@ class Application(tk.Tk):
 
         tree.pack()
 
-    # Funçao para deletar um produto
+    # Função para deletar um produto
     def delete_product(self, tree):
         # Obtém o item selecionado
         selected_item = tree.selection()
@@ -204,7 +217,7 @@ class Application(tk.Tk):
         confirm = messagebox.askyesno("Confirmação", f"Tem certeza que deseja deletar o produto ID {product_id}?")
 
         if confirm:
-            conn = sqlite3.connect('data/estoque_caixa.db')
+            conn = self.connect_to_database()  # Alterado
             cursor = conn.cursor()
             cursor.execute("DELETE FROM produtos WHERE id=?", (product_id,))
             conn.commit()
@@ -220,7 +233,7 @@ class Application(tk.Tk):
 
     # Função para zerar estoque
     def reset_quantities(self):
-        conn = sqlite3.connect('data/estoque_caixa.db')
+        conn = self.connect_to_database()  # Alterado
         cursor = conn.cursor()
         cursor.execute("UPDATE produtos SET quantidade = 0")
         conn.commit()
@@ -228,6 +241,7 @@ class Application(tk.Tk):
         messagebox.showinfo("Sucesso", "Quantidades de todos os produtos foram zeradas!")
         self.load_products()  # Atualiza o combobox de produtos
 
+    # Função para editar produtos
     def edit_product(self):
         selected_product = self.produto_combobox.get()
         if not selected_product:
@@ -236,7 +250,7 @@ class Application(tk.Tk):
 
         produto_id = selected_product.split(' ')[0]
 
-        conn = sqlite3.connect('data/estoque_caixa.db')
+        conn = self.connect_to_database()  # Alterado
         cursor = conn.cursor()
         cursor.execute("SELECT nome, quantidade, preco FROM produtos WHERE id=?", (produto_id,))
         produto = cursor.fetchone()
@@ -274,7 +288,7 @@ class Application(tk.Tk):
                     quantidade = int(quantidade)
                     preco = float(preco)
 
-                    conn = sqlite3.connect('data/estoque_caixa.db')
+                    conn = self.connect_to_database()  # Alterado
                     cursor = conn.cursor()
                     cursor.execute("UPDATE produtos SET nome=?, quantidade=?, preco=? WHERE id=?", (nome, quantidade, preco, produto_id))
                     conn.commit()
