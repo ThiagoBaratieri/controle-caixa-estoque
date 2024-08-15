@@ -10,7 +10,7 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Sistema de Controle de Caixa e Estoque")
-        self.geometry('1000x500')
+        self.geometry('500x500')
         self.setup_ui()
 
     def get_db_path(self):
